@@ -102,5 +102,5 @@ class FileViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'list':
-            return [CanDeleteUser()]
+            return [permissions.IsAuthenticated()]
         return super().get_permissions()
