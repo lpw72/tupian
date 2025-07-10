@@ -11,10 +11,11 @@ def generate_upload_token(filename, category):
     q = get_qiniu_auth()
     key = f'{category}/{filename}' if category else filename
     policy = {
-        'saveKey': key,
+        'saveKey': key,  # 显式设置saveKey
         'deadline': 3600  # 1小时有效期
     }
-    token = q.upload_token(settings.QINIU_BUCKET_NAME, key, 3600, policy)
+    # 将key参数设为None，避免scope自动包含key
+    token = q.upload_token(settings.QINIU_BUCKET_NAME, None, 3600, policy)
     return token, key
 
 def delete_qiniu_file(key):

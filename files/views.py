@@ -47,7 +47,7 @@ class FileViewSet(viewsets.ModelViewSet):
         # 删除数据库记录
         instance.delete()
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='upload-token')
     def upload_token(self, request):
         """获取七牛云上传凭证"""
         filename = request.query_params.get('filename')
@@ -56,8 +56,8 @@ class FileViewSet(viewsets.ModelViewSet):
         if not filename:
             return Response({'error': 'filename is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 获取类别名称
-        category_name = '未分类'
+        # 获取类别名称 - 将默认值从'未分类'改为None
+        category_name = None  # 修改此行
         if category_id:
             try:
                 category = Category.objects.get(id=category_id)
@@ -69,20 +69,21 @@ class FileViewSet(viewsets.ModelViewSet):
         return Response({
             'upload_token': token,
             'upload_url': settings.QINIU_UPLOAD_URL,
-            'filename': filename  # 修改为返回原始文件名而非带路径的key
+            'filename': filename,
+            'key': key  # 确保前端使用此key作为上传参数
         })
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=['post'], url_path='save-file-info')
     def save_file_info(self, request):
         """保存文件信息到数据库"""
         key = request.data.get('key')
         category_id = request.data.get('category')
         description = request.data.get('description', key)
-        hash_value = request.data.get('hash')  # 获取hash参数
-    
-        if not key or not category_id or not hash_value:  # 增加hash验证
+        # 移除hash参数相关代码
+        
+        if not key or not category_id:  # 移除hash验证
             return Response({
-                'error': 'key, category and hash are required'
+                'error': 'key and category are required'
             }, status=status.HTTP_400_BAD_REQUEST)
     
         try:
@@ -92,8 +93,8 @@ class FileViewSet(viewsets.ModelViewSet):
                 user=request.user,
                 description=description,
                 category=category,
-                url=file_url,
-                hash=hash_value  # 保存hash值
+                url=file_url
+                # 移除hash参数
             )
             return Response(FileSerializer(file).data, status=status.HTTP_201_CREATED)
         except Category.DoesNotExist:
