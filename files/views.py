@@ -16,9 +16,12 @@ class FileViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = File.objects.all()
-        # 管理员查看所有文件，其他用户查看自己的文件
-        if not (self.request.user.role and self.request.user.role.name == '管理员'):
-            queryset = queryset.filter(user=self.request.user)
+        # 先检查用户是否已认证
+        if self.request.user.is_authenticated:
+            # 仅对已认证用户进行角色判断
+            if not (self.request.user.role and self.request.user.role.name == '管理员'):
+                queryset = queryset.filter(user=self.request.user)
+        return queryset
 
         # 搜索功能
         search = self.request.query_params.get('search', None)
@@ -102,5 +105,6 @@ class FileViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'list':
-            return [permissions.IsAuthenticated()]
+            # 允许所有用户（包括未登录用户）访问文件列表
+            return [permissions.AllowAny()]
         return super().get_permissions()
