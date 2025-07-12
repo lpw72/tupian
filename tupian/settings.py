@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'categories',
     'roles',
     'permissions',
-    'rest_framework_simplejwt.token_blacklist',
+    # 'rest_framework_simplejwt.token_blacklist',  # 注释或删除此行
 ]
 
 # 修正为大写的AUTH_USER_MODEL

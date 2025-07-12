@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenBlacklistView
 from .serializers import UserSerializer, UserListSerializer, UserRoleUpdateSerializer
 from .models import CustomUser
@@ -13,6 +12,7 @@ from .serializers import ChangePasswordSerializer
 from rest_framework.generics import RetrieveUpdateAPIView
 from .serializers import UserSerializer, UserUpdateSerializer, ChangePasswordSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]

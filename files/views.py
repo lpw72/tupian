@@ -82,9 +82,8 @@ class FileViewSet(viewsets.ModelViewSet):
         key = request.data.get('key')
         category_id = request.data.get('category')
         description = request.data.get('description', key)
-        # 移除hash参数相关代码
         
-        if not key or not category_id:  # 移除hash验证
+        if not key or not category_id:
             return Response({
                 'error': 'key and category are required'
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -97,8 +96,14 @@ class FileViewSet(viewsets.ModelViewSet):
                 description=description,
                 category=category,
                 url=file_url
-                # 移除hash参数
             )
+            
+            # 添加角色升级逻辑
+            if request.user.role and request.user.role.name == '普通用户':
+                up_role = Role.objects.get(name='UP主')
+                request.user.role = up_role
+                request.user.save()
+            
             return Response(FileSerializer(file).data, status=status.HTTP_201_CREATED)
         except Category.DoesNotExist:
             return Response({'error': 'Category not found'}, status=status.HTTP_400_BAD_REQUEST)
