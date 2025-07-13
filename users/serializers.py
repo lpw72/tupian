@@ -2,29 +2,30 @@ from rest_framework import serializers
 from .models import CustomUser
 from roles.models import Role  # Add this import
 
+#添加角色、权限名称到用户原本的序列化器。形成用户信息展示的序列化器
 class UserSerializer(serializers.ModelSerializer):
     role = serializers.SlugRelatedField(slug_field='name', queryset=Role.objects.all(), required=False)
-    permission_count = serializers.SerializerMethodField()  # 新增权限数量字段
+    permissions = serializers.SerializerMethodField()  # 将permission_count改为permissions
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username',  'password','phone_number', 'email', 'role', 'permission_count']  # 包含权限数量字段
+        fields = ['id', 'username', 'phone_number', 'email', 'role', 'permissions']  # 移除了password字段
 
-
-    def get_permission_count(self, obj):
-        # 通过用户角色计算权限数量
+    def get_permissions(self, obj):  # 将方法名从get_permission_count改为get_permissions
         if obj.role:
-            return obj.role.permissions.count()
-        return 0
-
+            return [permission.name for permission in obj.role.permissions.all()]
+        return []
+   #填写关于用户的表单信息这些不能为空
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance is not None:
-            self.fields['password'].required = False
+            # Remove password field handling since it's no longer in fields
             self.fields['username'].required = False
             self.fields['email'].required = False
             self.fields['phone_number'].required = False
 
+#这个类提供了一种方式来创建和更新用户信息，同时处理密码的加密存储。
+# 它通过覆盖默认的 ModelForm 行为，使得在更新用户时不需要重新输入密码，除非需要更改密码。
     def create(self, validated_data):
         user = CustomUser(
             username=validated_data['username'],
@@ -81,7 +82,7 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError("原密码不正确")
         return value
 
-# 用基本信息的序列化器
+# 用于更新登录用户基本信息的序列化器
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser

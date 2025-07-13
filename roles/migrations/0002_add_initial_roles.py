@@ -1,5 +1,5 @@
 from django.db import migrations
-from permissions.models import Permission
+
 
 def add_initial_roles(apps, schema_editor):
     Role = apps.get_model('roles', 'Role')
