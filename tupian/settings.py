@@ -157,15 +157,16 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # 访问令牌有效期1小时
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # 刷新令牌有效期7天
     'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'BLACKLIST_AFTER_ROTATION': False,  # 禁用黑名单功能，因为已移除token_blacklist应用
+    'AUTH_HEADER_TYPES': ('Bearer',),  # 添加认证头类型设置
 }
 
 
 # 七牛云配置
 QINIU_ACCESS_KEY = 'sn-Z6WhfwMvTDLDEcoZlNCAe2fsIRnkJ4O25CeNi'
 QINIU_SECRET_KEY = 'URGrex3ddiDAfeXSD2r8okGChmDK1zlwLH_9gyB6'
-QINIU_BUCKET_NAME = 'zhhibo1'
-QINIU_DOMAIN = 'syr2tubvx.hn-bkt.clouddn.com'  # 你的七牛云域名
+QINIU_BUCKET_NAME = 'zhhibo'
+QINIU_DOMAIN = 'szzh7g7ua.hn-bkt.clouddn.com'  # 你的七牛云域名
 QINIU_UPLOAD_URL = 'https://upload-z2.qiniup.com'  # 上传地址
 
 

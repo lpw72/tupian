@@ -12,17 +12,12 @@ from roles.models import Role
 
 class FileViewSet(viewsets.ModelViewSet):
     serializer_class = FileSerializer  # 设置序列化器类为FileSerializer
-    permission_classes = [permissions.IsAuthenticated]  # 设置权限类为IsAuthenticated，要求用户必须认证才能访问
+    # 移除全局认证要求，允许所有用户访问
+    permission_classes = [permissions.AllowAny]  # 修改此行
 
     def get_queryset(self):
         queryset = File.objects.all()  # 获取所有文件对象的查询集
-        # 先检查用户是否已认证
-        # if self.request.user.is_authenticated:
-        #     # 检查用户是否有"删除任何文件权限"
-        #     has_delete_permission = self.request.user.role and self.request.user.role.permissions.filter(name='删除任何文件权限').exists()
-        #     if not has_delete_permission:
-        #         queryset = queryset.filter(user=self.request.user)  # 如果用户没有删除任何文件权限，则只返回属于该用户的文件
-
+        # 删除用户认证和权限过滤相关代码
         # 搜索功能
         search = self.request.query_params.get('search', None)  # 获取查询参数中的'search'值
         if search:
@@ -31,6 +26,11 @@ class FileViewSet(viewsets.ModelViewSet):
                 Q(category__name__icontains=search)  # 或者过滤category名称包含搜索关键词的文件
             )
         return queryset  # 返回处理后的查询集
+
+    # 保留其他方法但确保不影响匿名访问
+    def get_permissions(self):
+        # 移除原有的权限判断，所有操作都使用全局的AllowAny权限
+        return super().get_permissions()
 
     def perform_create(self, serializer):
         # 保存文件并关联当前用户
@@ -109,11 +109,5 @@ class FileViewSet(viewsets.ModelViewSet):
         except Category.DoesNotExist:
             return Response({'error': 'Category not found'},
                             status=status.HTTP_400_BAD_REQUEST)  # 如果找不到对应的Category对象，则返回错误响应
-
-    def get_permissions(self):
-        if self.action == 'list':
-            # 允许所有用户（包括未登录用户）访问文件列表
-            return [permissions.AllowAny()]  # 对于list操作，允许任何人访问
-        return super().get_permissions()  # 对于其他操作，使用父类的权限设置
 
 

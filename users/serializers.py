@@ -5,11 +5,12 @@ from roles.models import Role  # Add this import
 #添加角色、权限名称到用户原本的序列化器。形成用户信息展示的序列化器
 class UserSerializer(serializers.ModelSerializer):
     role = serializers.SlugRelatedField(slug_field='name', queryset=Role.objects.all(), required=False)
-    permissions = serializers.SerializerMethodField()  # 将permission_count改为permissions
+    permissions = serializers.SerializerMethodField()
+    password = serializers.CharField(write_only=True, required=True)  # Add this line
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'phone_number', 'email', 'role', 'permissions']  # 移除了password字段
+        fields = ['id', 'username', 'phone_number', 'email', 'role', 'permissions', 'password']  # Add password to fields
 
     def get_permissions(self, obj):  # 将方法名从get_permission_count改为get_permissions
         if obj.role:
@@ -29,8 +30,8 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = CustomUser(
             username=validated_data['username'],
-            email=validated_data['email'],
-            phone_number=validated_data['phone_number']
+            email=validated_data.get('email', ''),  # Add default values
+            phone_number=validated_data.get('phone_number', '')  # Add default values
         )
         user.set_password(validated_data['password'])
         user.save()
