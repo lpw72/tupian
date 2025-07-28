@@ -165,7 +165,7 @@ SIMPLE_JWT = {
 # 七牛云配置
 QINIU_ACCESS_KEY = 'sn-Z6WhfwMvTDLDEcoZlNCAe2fsIRnkJ4O25CeNi'
 QINIU_SECRET_KEY = 'URGrex3ddiDAfeXSD2r8okGChmDK1zlwLH_9gyB6'
-QINIU_BUCKET_NAME = 'zhhibo'
+QINIU_BUCKET_NAME = 'zhhibo2'
 QINIU_DOMAIN = 'szzh7g7ua.hn-bkt.clouddn.com'  # 你的七牛云域名
 QINIU_UPLOAD_URL = 'https://upload-z2.qiniup.com'  # 上传地址
 
